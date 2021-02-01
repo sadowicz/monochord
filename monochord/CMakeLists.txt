@@ -3,4 +3,4 @@ project(monochord C)
 
 set(CMAKE_C_STANDARD 11)
 
-add_executable(monochord monochord.c)
+add_executable(monochord monochord.c utils.c utils.h)
