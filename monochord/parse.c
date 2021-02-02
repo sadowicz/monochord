@@ -1,5 +1,32 @@
 #include "parse.h"
 
+void interpretDatagram(char* datagram, SimParams* params)
+{
+    char nameBuf[MAX_NAME_LEN] = {0};
+    char valueBuf[MAX_VALUE_LEN] = {0};
+
+    splitRecord(datagram, nameBuf, valueBuf);
+
+    //printf("Received: %s\nName: %s\nValue: %s\n\n", datagram, nameBuf, valueBuf);
+}
+
+void splitRecord(char* datagram, char* name, char* value)
+{
+    char* readPtr = datagram;
+    int currRead;
+
+    if(!sscanf(datagram, "%[^: \t]%n", name, &currRead))
+        errExit("splitRecord: Unable to get record name");
+
+    readPtr += currRead;
+    while(*readPtr == ' ' || *readPtr == '\t' ||*readPtr == ':')
+        readPtr++;
+
+    if(readPtr != datagram + strlen(datagram))
+        if(!sscanf(readPtr, "%s", value))
+            errExit("splitRecord: Unable to get record value");
+}
+
 short strToPort(char* str)
 {
     char* endptr = NULL;
