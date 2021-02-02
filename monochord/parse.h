@@ -12,15 +12,14 @@
 
 #include "utils.h"
 
-void interpretDatagram(char* datagram, SimParams* params);
-void interpretRecords(char* datagram, SimParams* params, int* reportFlag);
+void interpretDatagram(char* datagram, SimParams* params, SimFlags* flags);
+void interpretRecords(char* datagram, SimParams* params, SimFlags* flags);
 void splitRecord(char* record, char* name, char* value);
-void executeRecord(char* name, char* value, SimParams* params, int* reportFlag);
+void executeRecord(char* name, char* value, SimParams* params, SimFlags* flags);
 
 short strToPort(char* str);
 float strToFloat(char* str);
 float strToPosFloat(char* str);
 int strToInt(char* str);
-int strToRtNumber(char* str);
 
 #endif

@@ -1,20 +1,23 @@
 #include <signal.h>
 #include "parse.h"
 
-void interpretDatagram(char* datagram, SimParams* params)
+void interpretDatagram(char* datagram, SimParams* params, SimFlags* flags)
 {
     //printf("Received:-----------\n%s\n-------------\n", datagram);
 
     int reportFlag = 0;
-    interpretRecords(datagram, params, &reportFlag);
+    interpretRecords(datagram, params, flags);
 
-    if(reportFlag)
+    if(flags->report)
     {
-        //TODO: send report}
+        char repBuf[512] = {};
+        createReport(repBuf, params, flags);
+        printf("%s\n", repBuf);
+        flags->report = 0; // TODO: not here -> delete
     }
 }
 
-void interpretRecords(char* datagram, SimParams* params, int* reportFlag)
+void interpretRecords(char* datagram, SimParams* params, SimFlags* flags)
 {
     char recordBuf[MAX_RECORD_LEN] = {0};
     char nameBuf[MAX_NAME_LEN] = {0};
@@ -30,7 +33,7 @@ void interpretRecords(char* datagram, SimParams* params, int* reportFlag)
             errExit("Unable to get record");
 
         splitRecord(recordBuf, nameBuf, valueBuf);
-        executeRecord(nameBuf, valueBuf, params, reportFlag);
+        executeRecord(nameBuf, valueBuf, params, flags);
 
         readPtr += (currRead + 1);
         totalRead += (currRead + 1);
@@ -61,22 +64,40 @@ void splitRecord(char* record, char* name, char* value)
             errExit("splitRecord: Unable to get record value");
 }
 
-void executeRecord(char* name, char* value, SimParams* params, int* reportFlag)
+void executeRecord(char* name, char* value, SimParams* params, SimFlags* flags)
 {
     if(!strcmp("amp", name))
+    {
         params->amp = strToFloat(value);
+        flags->reset = 1;
+    }
     else if(!strcmp("freq", name))
+    {
         params->freq = strToPosFloat(value);
+        flags->reset = 1;
+    }
     else if(!strcmp("probe", name))
+    {
         params->probe = strToPosFloat(value);
+        flags->reset = 1;
+    }
     else if(!strcmp("period", name))
+    {
         params->period = strToFloat(value);
+
+        if(params->period < 0) flags->stopped = 2;
+        else if(!params->period) flags->stopped = 1;
+        else flags->stopped = 0;
+    }
     else if(!strcmp("pid", name))
         params->pid = strToInt(value);
     else if(!strcmp("rt", name))
-        params->rt = strToRtNumber(value);
+    {
+        params->rt = strToInt(value);
+        flags->rtOutOfRange = (uint8_t) (params->rt > SIGRTMIN && params->rt < SIGRTMAX);
+    }
     else if(!strcmp("raport", name))
-        *reportFlag = 1;
+        flags->report = 1;
     else
         errExit("executeRecord: Unrecognized record name");
 }
@@ -128,13 +149,4 @@ int strToInt(char* str)
         errExit("strToInt: Unable to convert string to int number");
 
     return (int)res;
-}
-
-int strToRtNumber(char* str)
-{
-    int res = strToInt(str);
-    if(res < SIGRTMIN || res > SIGRTMAX)
-        errExit("strToRtNumber: Real-Time signal number out of range");
-
-    return res;
 }

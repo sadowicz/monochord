@@ -22,6 +22,16 @@ void initParamsDefaults(SimParams* params)
     params->rt = 0;
 }
 
+void initFlagsDefaults(SimFlags* flags)
+{
+    flags->report = 0;
+    flags->reset = 0;
+    flags->stopped = 2;
+    flags->suspended = 0;
+    flags->pidNotExist = 0;
+    flags->rtOutOfRange = 1;
+}
+
 double getTimestampSec()
 {
     struct timespec ts;

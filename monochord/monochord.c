@@ -20,6 +20,9 @@ int main(int argc, char* argv[])
     SimParams  params;
     initParamsDefaults(&params);
 
+    SimFlags flags;
+    initFlagsDefaults(&flags);
+
     double refPoint = getTimestampSec();
 
     char buf[512] = {0};
@@ -30,7 +33,7 @@ int main(int argc, char* argv[])
         ssize_t received = recv(sockfd, &buf, sizeof(buf), MSG_DONTWAIT);
         if(received != -1)
         {
-            interpretDatagram(buf, &params);
+            interpretDatagram(buf, &params, &flags);
             memset(buf, 0, sizeof(buf));
         }
         else if(errno == EAGAIN)

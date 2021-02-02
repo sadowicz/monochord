@@ -30,7 +30,10 @@ void errExit(const char* msg);
 void usageExit(const char* programName, const char* msg);
 
 void initParamsDefaults(SimParams* params);
+void  initFlagsDefaults(SimFlags* flags);
+
 double getTimestampSec();
+
 void createReport(char* report, SimParams* params, SimFlags* flags);
 
 #endif
