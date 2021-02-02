@@ -2,23 +2,12 @@
 
 #include <stdio.h>
 #include <time.h>
+#include <zconf.h>  // TODO: delete
+#include <memory.h> // TODO: delete
 
 #include "utils.h"
 #include "parse.h"
 #include "udp.h"
-
-typedef struct SimParams {
-    float amp;      // amplitude
-    float freq;     // frequency [Hz]
-    float probe;    // probe frequency [s]
-    float period;   // probing (simulation) time [s]
-                    // 0 -infinite  /   <0 - pause probing
-    pid_t pid;
-    int rt;
-}SimParams;
-
-void initParamsDefaults(SimParams* params);
-double getTimestampSec();
 
 int main(int argc, char* argv[])
 {
@@ -33,29 +22,27 @@ int main(int argc, char* argv[])
 
     double refPoint = getTimestampSec();
 
-    
+    /*char buf[512] = {0};
+
+    while(1)
+    {
+        errno = 0;
+        ssize_t received = recv(sockfd, &buf, sizeof(buf), MSG_DONTWAIT);
+        if(received != -1)
+        {
+            printf("Received: %s", buf);
+            memset(buf, 0, sizeof(buf));
+        }
+        else if(errno == EAGAIN)
+        {
+            sleep(5);
+            printf("\t>wake up!\n");
+        }
+        else
+            errExit("Unable to receive datagram");
+    }*/
 
     // TODO: close sockfd
 
     return 0;
-}
-
-void initParamsDefaults(SimParams* params)
-{
-    params->amp = 1.f;
-    params->freq = .25f;
-    params->probe = 1.f;
-    params->period = -1.f;
-    params->pid = 1;
-    params->rt = 0;
-}
-
-double getTimestampSec()
-{
-    struct timespec ts;
-
-    if(clock_gettime(CLOCK_MONOTONIC, &ts))
-        errExit("getTimestampSec: Unable to get clock time");
-
-    return ts.tv_sec + (double)ts.tv_nsec / 1000000000;
 }
