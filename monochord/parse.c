@@ -8,6 +8,10 @@ void interpretDatagram(char* datagram, SimParams* params)
     int reportFlag = 0;
     interpretRecords(datagram, params, &reportFlag);
 
+    if(reportFlag)
+    {
+        //TODO: send report}
+    }
 }
 
 void interpretRecords(char* datagram, SimParams* params, int* reportFlag)

@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <signal.h>
+#include <stdint.h>
 
 typedef struct SimParams {
     float amp;      // amplitude
@@ -16,10 +17,20 @@ typedef struct SimParams {
     int rt;
 }SimParams;
 
+typedef struct SimFlags {
+    uint8_t reset;
+    uint8_t report;
+    uint8_t suspended;
+    uint8_t stopped;    // 0 : default , 1 : non-stop , 2 : stopped
+    uint8_t pidNotExist;
+    uint8_t rtOutOfRange;
+}SimFlags;
+
 void errExit(const char* msg);
 void usageExit(const char* programName, const char* msg);
 
 void initParamsDefaults(SimParams* params);
 double getTimestampSec();
+void createReport(char* report, SimParams* params, SimFlags* flags);
 
 #endif
