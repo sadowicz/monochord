@@ -8,5 +8,8 @@
 #include "utils.h"
 
 short strToPort(char* str);
+float strToFloat(char* str);
+float strToPosFloat(char* str);
+int strToInt(char* str);
 
 #endif
