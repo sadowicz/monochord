@@ -22,7 +22,7 @@ int main(int argc, char* argv[])
 
     double refPoint = getTimestampSec();
 
-    /*char buf[512] = {0};
+    char buf[512] = {0};
 
     while(1)
     {
@@ -30,17 +30,17 @@ int main(int argc, char* argv[])
         ssize_t received = recv(sockfd, &buf, sizeof(buf), MSG_DONTWAIT);
         if(received != -1)
         {
-            printf("Received: %s", buf);
+            interpretDatagram(buf, &params);
             memset(buf, 0, sizeof(buf));
         }
         else if(errno == EAGAIN)
         {
             sleep(5);
-            printf("\t>wake up!\n");
+            //printf("\t>wake up!\n");
         }
         else
             errExit("Unable to receive datagram");
-    }*/
+    }
 
     // TODO: close sockfd
 
