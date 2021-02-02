@@ -16,8 +16,7 @@ void registerSocket(int sockfd, short port)
     struct sockaddr_in sAddr = {
             .sin_family = AF_INET,
             .sin_port = htons((in_port_t)port),
-            .sin_addr.s_addr = htonl(INADDR_ANY)    // htonl probably not necessary since INADDR_ANY is 0,
-                                                    // but placed here for cleaner code
+            .sin_addr.s_addr = htonl(INADDR_LOOPBACK)
     };
 
     if(bind(sockfd, (struct sockaddr*)&sAddr, sizeof(sAddr)))
