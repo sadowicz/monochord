@@ -9,6 +9,7 @@
 #include <signal.h>
 #include <stdint.h>
 #include <math.h>
+#include <errno.h>
 
 typedef struct SimParams {
     float amp;      // amplitude
@@ -25,7 +26,7 @@ typedef struct SimFlags {
     uint8_t report;
     uint8_t suspended;
     uint8_t stopped;    // 0 : default , 1 : non-stop , 2 : stopped
-    uint8_t pidNotExist;
+    uint8_t pidErr;     // 0 : can send signal , 1 : cannot send , 2 : not-exists
     uint8_t rtOutOfRange;
 }SimFlags;
 
@@ -36,6 +37,7 @@ void initParamsDefaults(SimParams* params);
 void  initFlagsDefaults(SimFlags* flags);
 
 void registerSignalHandler(int signal, void(*handler)(int));
+void sendRtSignal(SimParams* params, SimFlags* flags, double* value);
 
 void createTimer(struct sigevent* sevp, timer_t* timerId);
 void armTimer(timer_t timerId, float interval);

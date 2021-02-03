@@ -29,7 +29,7 @@ void initFlagsDefaults(SimFlags* flags)
     flags->reset = 0;
     flags->stopped = 2;
     flags->suspended = 0;
-    flags->pidNotExist = 0;
+    flags->pidErr = 0;
     flags->rtOutOfRange = 1;
 }
 
@@ -48,6 +48,24 @@ void registerSignalHandler(int signal, void(*handler)(int))
 
     if(sigaction(signal, &sa, NULL))
         errExit("registerSignalHandler: Unable to register signal handler");
+}
+
+void sendRtSignal(SimParams* params, SimFlags* flags, double* value)
+{
+    union sigval val;
+    val.sival_ptr = (void*)value;
+
+    errno = 0;
+
+    if(sigqueue(params->pid, params->rt, val))
+    {
+        if(errno == ESRCH)
+            flags->pidErr = 2;
+        else
+            flags->pidErr = 1;
+    }
+    else
+        flags->pidErr = 0;
 }
 
 void createTimer(struct sigevent* sevp, timer_t* timerId)
@@ -115,7 +133,7 @@ void createReport(char* report, SimParams* params, SimFlags* flags)
     }
 
     pr = sprintf(report + printed, "\npid %d%srt %d%s",
-            params->pid, (flags->pidNotExist)? " non-exists\n" : " exists\n",
+            params->pid, (flags->pidErr == 2)? " non-exists\n" : " exists\n",
             params->rt, (flags->rtOutOfRange)? " out-of-range\n" : " in-range");
     if(pr == -1)
         errExit("Unable to print pid into report buffer");
