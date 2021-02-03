@@ -1,7 +1,7 @@
 #ifndef PARSE_H
 #define PARSE_H
 
-#define _POSIX_C_SOURCE 2
+#define _POSIX_C_SOURCE 199309L
 #define _XOPEN_SOURCE
 
 #include <stdio.h>
