@@ -31,7 +31,10 @@ void parseArgs(int argc, char** argv, int* dataSig, int* cmdSig, char** binPath,
         initPath(txtPath, "-");
 
     if(*dataSig == -1 || *cmdSig == -1)
-        errExit("parseArgs: Missing non optional argument");
+        errExit("parseArgs: Missing non optional argument.");
+
+    if(*dataSig == *cmdSig)
+        errExit("parseArgs: Signals cannot have same value.");
 
 }
 
