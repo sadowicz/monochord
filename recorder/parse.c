@@ -1,6 +1,6 @@
 #include "parse.h"
 
-void parseArgs(int argc, char** argv, int* dataSig, int* cmdSig, char** txtPath, char** binPath)
+void parseArgs(int argc, char** argv, int* dataSig, int* cmdSig, char** binPath, char** txtPath)
 {
     int opt;
 
@@ -9,18 +9,10 @@ void parseArgs(int argc, char** argv, int* dataSig, int* cmdSig, char** txtPath,
         switch(opt)
         {
             case 'b':
-                *binPath = (char*)calloc(strlen(optarg) + 1, sizeof(char));
-                if(!*binPath)
-                    errExit("parseArgs: Unable to allocate binary file path buffer");
-
-                memcpy(*binPath, optarg, strlen(optarg));
+                initPath(binPath, optarg);
                 break;
             case 't':
-                *txtPath = (char*)calloc(strlen(optarg) + 1, sizeof(char));
-                if(!*txtPath)
-                    errExit("parseArgs: Unable to allocate text file path buffer");
-
-                memcpy(*txtPath, optarg, strlen(optarg));
+                initPath(txtPath, optarg);
                 break;
             case 'd':
                 *dataSig = strToRtSig(optarg);
@@ -33,16 +25,23 @@ void parseArgs(int argc, char** argv, int* dataSig, int* cmdSig, char** txtPath,
             case '?':
                 errExit("parseArgs: Unrecognized argument.");
         }
-
-        if(!*txtPath)   // init txtPath with default value if no value was given in argv
-        {
-            *txtPath = (char*)calloc(2, sizeof(char));
-            if(!*txtPath)
-                errExit("parseArgs: Unable to allocate text file path buffer");
-
-            memcpy(*txtPath, "-", 1);
-        }
     }
+
+    if(!*txtPath)   // init txtPath with default value if no value was given in argv
+        initPath(txtPath, "-");
+
+    if(*dataSig == -1 || *cmdSig == -1)
+        errExit("parseArgs: Missing non optional argument");
+
+}
+
+void initPath(char** path, char* value)
+{
+    *path = (char*)calloc(strlen(value) + 1, sizeof(char));
+    if(!*path)
+        errExit("initPath: Unable to allocate file path buffer");
+
+    memcpy(*path, value, strlen(value));
 }
 
 int strToRtSig(char* str)
