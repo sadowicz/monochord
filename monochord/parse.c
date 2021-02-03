@@ -3,21 +3,6 @@
 
 void interpretDatagram(char* datagram, SimParams* params, SimFlags* flags)
 {
-    //printf("Received:-----------\n%s\n-------------\n", datagram);
-
-    interpretRecords(datagram, params, flags);
-
-    /*if(flags->report)
-    {
-        char repBuf[512] = {0};
-        createReport(repBuf, params, flags);
-        printf("%s\n", repBuf);
-        flags->report = 0; // TODO: not here -> delete
-    }*/
-}
-
-void interpretRecords(char* datagram, SimParams* params, SimFlags* flags)
-{
     char recordBuf[MAX_RECORD_LEN] = {0};
     char nameBuf[MAX_NAME_LEN] = {0};
     char valueBuf[MAX_VALUE_LEN] = {0};
@@ -29,7 +14,7 @@ void interpretRecords(char* datagram, SimParams* params, SimFlags* flags)
     while(totalRead < strlen(datagram))
     {
         if(!sscanf(readPtr, "%[^\n]%n", recordBuf, &currRead))
-            errExit("Unable to get record");
+            errExit("interpretDatagram: Unable to get record");
 
         splitRecord(recordBuf, nameBuf, valueBuf);
         executeRecord(nameBuf, valueBuf, params, flags);
@@ -41,9 +26,6 @@ void interpretRecords(char* datagram, SimParams* params, SimFlags* flags)
         memset(nameBuf, 0, MAX_NAME_LEN);
         memset(valueBuf, 0, MAX_VALUE_LEN);
     }
-
-    /*printf("amp = %f\nfreq = %f\nprobe = %f\nperiod = %f\npid = %d\nrt = %d\nreport = %d\n",
-           params->amp, params->freq, params->probe, params->period, params->pid, params->rt, *reportFlag);*/
 }
 
 void splitRecord(char* record, char* name, char* value)
