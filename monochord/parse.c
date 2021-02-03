@@ -65,6 +65,7 @@ void executeRecord(char* name, char* value, SimParams* params, SimFlags* flags)
     else if(!strcmp("period", name))
     {
         params->period = strToFloat(value);
+        params->timeRemaining = params->period;
 
         if(params->period < 0) flags->stopped = 2;
         else if(!params->period) flags->stopped = 1;
@@ -78,7 +79,7 @@ void executeRecord(char* name, char* value, SimParams* params, SimFlags* flags)
     else if(!strcmp("rt", name))
     {
         params->rt = strToInt(value);
-        flags->rtOutOfRange = (uint8_t)(params->rt > SIGRTMIN && params->rt < SIGRTMAX);
+        flags->rtOutOfRange = (uint8_t)(params->rt < SIGRTMIN || params->rt > SIGRTMAX);
     }
     else if(!strcmp("raport", name))
         flags->report = 1;
@@ -86,6 +87,39 @@ void executeRecord(char* name, char* value, SimParams* params, SimFlags* flags)
         errExit("executeRecord: Unrecognized record name");
 }
 
+void createReport(char* report, SimParams* params, SimFlags* flags)
+{
+    int printed = sprintf(report, "amp %f\nfreq %f\nprobe %f\nperiod %f",
+                          params->amp, params->freq, params->probe, params->period);
+    if(printed == -1)
+        errExit("createReport: Unable to print into report buffer");
+
+    int pr = 0;
+
+    if(params->period <= 0)
+    {
+        pr = sprintf(report + printed, (flags->stopped > 1) ? " stopped" : " non-stop");
+        if(pr == -1)
+            errExit("Unable to print stopped info into report buffer");
+
+        printed += pr;
+    }
+
+    if(params->period >= 0 && flags->suspended)
+    {
+        pr = sprintf(report + printed, " suspended");
+        if(pr == -1)
+            errExit("Unable to print suspended info into report buffer");
+
+        printed += pr;
+    }
+
+    pr = sprintf(report + printed, "\npid %d%srt %d%s",
+                 params->pid, (flags->pidErr == 2)? " non-exists\n" : " exists\n",
+                 params->rt, (flags->rtOutOfRange)? " out-of-range\n" : " in-range\n");
+    if(pr == -1)
+        errExit("Unable to print pid into report buffer");
+}
 
 short strToPort(char* str)
 {

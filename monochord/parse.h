@@ -19,6 +19,8 @@ void interpretDatagram(char* datagram, SimParams* params, SimFlags* flags);
 void splitRecord(char* record, char* name, char* value);
 void executeRecord(char* name, char* value, SimParams* params, SimFlags* flags);
 
+void createReport(char* report, SimParams* params, SimFlags* flags);
+
 short strToPort(char* str);
 float strToFloat(char* str);
 float strToPosFloat(char* str);

@@ -22,6 +22,7 @@ typedef struct SimParams {
     pid_t pid;
     int rt;
 
+    float timeRemaining;
     timer_t timerId;
 }SimParams;
 
@@ -49,9 +50,5 @@ void armTimer(timer_t timerId, float interval);
 double getTimestampSec();
 
 double calcSinusoide(SimParams* params, double time);
-
-void createReport(char* report, SimParams* params, SimFlags* flags);
-
-
 
 #endif

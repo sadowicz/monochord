@@ -22,6 +22,7 @@ void initParamsDefaults(SimParams* params)
     params->rt = 0;
 
     createTimer(&params->timerId);
+    params->timeRemaining = params->period;
 }
 
 void initFlagsDefaults(SimFlags* flags)
@@ -106,38 +107,4 @@ double getTimestampSec()
 double calcSinusoide(SimParams* params, double time)
 {
     return params->amp * sin(2 * PI * params->freq * time);
-}
-
-void createReport(char* report, SimParams* params, SimFlags* flags)
-{
-    int printed = sprintf(report, "amp %f\nfreq %f\nprobe %f\nperiod %f",
-            params->amp, params->freq, params->probe, params->period);
-    if(printed == -1)
-        errExit("createReport: Unable to print into report buffer");
-
-    int pr = 0;
-
-    if(params->period <= 0)
-    {
-        pr = sprintf(report + printed, (flags->stopped > 1) ? " stopped" : " non-stop");
-        if(pr == -1)
-            errExit("Unable to print stopped info into report buffer");
-
-        printed += pr;
-    }
-
-    if(params->period >= 0 && flags->suspended)
-    {
-        pr = sprintf(report + printed, " suspended");
-        if(pr == -1)
-            errExit("Unable to print suspended info into report buffer");
-
-        printed += pr;
-    }
-
-    pr = sprintf(report + printed, "\npid %d%srt %d%s",
-            params->pid, (flags->pidErr == 2)? " non-exists\n" : " exists\n",
-            params->rt, (flags->rtOutOfRange)? " out-of-range\n" : " in-range");
-    if(pr == -1)
-        errExit("Unable to print pid into report buffer");
 }
