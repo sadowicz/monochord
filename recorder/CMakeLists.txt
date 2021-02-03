@@ -3,4 +3,4 @@ project(recorder C)
 
 set(CMAKE_C_STANDARD 11)
 
-add_executable(recorder main.c parse.c parse.h)
+add_executable(recorder rejestrator.c parse.c parse.h utils.c utils.h)
