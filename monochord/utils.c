@@ -12,7 +12,7 @@ void usageExit(const char* programName, const char* msg)
     exit(1);
 }
 
-void initParamsDefaults(SimParams* params, struct sigevent* sevp)
+void initParamsDefaults(SimParams* params)
 {
     params->amp = 1.0f;
     params->freq = 0.25f;
@@ -21,7 +21,7 @@ void initParamsDefaults(SimParams* params, struct sigevent* sevp)
     params->pid = 1;
     params->rt = 0;
 
-    createTimer(sevp, &params->timerId);
+    createTimer(&params->timerId);
 }
 
 void initFlagsDefaults(SimFlags* flags)
@@ -69,12 +69,14 @@ void sendRtSignal(SimParams* params, SimFlags* flags, double* value)
         flags->pidErr = 0;
 }
 
-void createTimer(struct sigevent* sevp, timer_t* timerId)
+void createTimer(timer_t* timerId)
 {
-    sevp->sigev_notify = SIGEV_SIGNAL;
-    sevp->sigev_signo = SIGALRM;
+    struct sigevent sevp;
 
-    if(timer_create(CLOCK_REALTIME, sevp, timerId))
+    sevp.sigev_notify = SIGEV_SIGNAL;
+    sevp.sigev_signo = SIGALRM;
+
+    if(timer_create(CLOCK_REALTIME, &sevp, timerId))
         errExit("createTimer: Unable to create timer.");
 
 }

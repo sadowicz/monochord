@@ -37,13 +37,13 @@ typedef struct SimFlags {
 void errExit(const char* msg);
 void usageExit(const char* programName, const char* msg);
 
-void initParamsDefaults(SimParams* params, struct sigevent* sevp);
+void initParamsDefaults(SimParams* params);
 void  initFlagsDefaults(SimFlags* flags);
 
 void registerSignalHandler(int signal, void(*handler)(int));
 void sendRtSignal(SimParams* params, SimFlags* flags, double* value);
 
-void createTimer(struct sigevent* sevp, timer_t* timerId);
+void createTimer(timer_t* timerId);
 void armTimer(timer_t timerId, float interval);
 
 double getTimestampSec();
