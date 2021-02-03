@@ -5,16 +5,15 @@ void interpretDatagram(char* datagram, SimParams* params, SimFlags* flags)
 {
     //printf("Received:-----------\n%s\n-------------\n", datagram);
 
-    int reportFlag = 0;
     interpretRecords(datagram, params, flags);
 
-    if(flags->report)
+    /*if(flags->report)
     {
-        char repBuf[512] = {};
+        char repBuf[512] = {0};
         createReport(repBuf, params, flags);
         printf("%s\n", repBuf);
         flags->report = 0; // TODO: not here -> delete
-    }
+    }*/
 }
 
 void interpretRecords(char* datagram, SimParams* params, SimFlags* flags)
@@ -79,7 +78,6 @@ void executeRecord(char* name, char* value, SimParams* params, SimFlags* flags)
     else if(!strcmp("probe", name))
     {
         params->probe = strToPosFloat(value);
-        flags->reset = 1;
     }
     else if(!strcmp("period", name))
     {

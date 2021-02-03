@@ -42,6 +42,11 @@ double getTimestampSec()
     return ts.tv_sec + (double)ts.tv_nsec / 1000000000;
 }
 
+double calcSinusoide(SimParams* params, double time)
+{
+    return params->amp * sin(2 * M_PI * params->freq * time);
+}
+
 void createReport(char* report, SimParams* params, SimFlags* flags)
 {
     int printed = sprintf(report, "amp %f\nfreq %f\nprobe %f\nperiod %f",

@@ -6,6 +6,7 @@
 #include <time.h>
 #include <signal.h>
 #include <stdint.h>
+#include <math.h>
 
 typedef struct SimParams {
     float amp;      // amplitude
@@ -34,6 +35,10 @@ void  initFlagsDefaults(SimFlags* flags);
 
 double getTimestampSec();
 
+double calcSinusoide(SimParams* params, double time);
+
 void createReport(char* report, SimParams* params, SimFlags* flags);
+
+
 
 #endif
