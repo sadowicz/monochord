@@ -77,7 +77,7 @@ void createTimer(timer_t* timerId)
     sevp.sigev_notify = SIGEV_SIGNAL;
     sevp.sigev_signo = SIGALRM;
 
-    if(timer_create(CLOCK_REALTIME, &sevp, timerId))
+    if(timer_create(CLOCK_MONOTONIC, &sevp, timerId))
         errExit("createTimer: Unable to create timer.");
 
 }
