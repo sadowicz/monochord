@@ -1,6 +1,9 @@
 #ifndef PARSE_H
 #define PARSE_H
 
+#define _ISOC99_SOURCE
+#define _POSIX_C_SOURCE 200809L
+
 #define MAX_RECORD_LEN 128
 #define MAX_NAME_LEN 8
 #define MAX_VALUE_LEN 50

@@ -1,6 +1,7 @@
 #ifndef UDP_H
 #define UDP_H
 
+#define _POSIX_C_SOURCE 200809L
 #define MAX_DGRAM_LEN 512
 
 #include <unistd.h>
