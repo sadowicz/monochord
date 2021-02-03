@@ -1,3 +1,5 @@
+#define _POSIX_C_SOURCE 200809L
+
 #ifndef UTILS_H
 #define UTILS_H
 
@@ -32,6 +34,11 @@ void usageExit(const char* programName, const char* msg);
 
 void initParamsDefaults(SimParams* params);
 void  initFlagsDefaults(SimFlags* flags);
+
+void registerSignalHandler(int signal, void(*handler)(int));
+
+void createTimer(struct sigevent* sevp, timer_t* timerId);
+void armTimer(timer_t timerId, float interval);
 
 double getTimestampSec();
 

@@ -9,8 +9,11 @@
 #include "parse.h"
 #include "udp.h"
 
-uint8_t alrm = 0;
-uint8_t io = 0;
+volatile uint8_t alrm = 0;
+volatile uint8_t io = 0;
+
+void alrmHandler(int signo);
+void ioHandler(int signo);
 
 int main(int argc, char* argv[])
 {
@@ -79,4 +82,14 @@ int main(int argc, char* argv[])
     // TODO: close sockfd
 
     return 0;
+}
+
+void alrmHandler(int signo)
+{
+    alrm = 1;
+}
+
+void ioHandler(int signo)
+{
+    io = 1;
 }

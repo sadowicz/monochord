@@ -1,3 +1,4 @@
+#include <math.h>
 #include "utils.h"
 
 void errExit(const char* msg)
@@ -30,6 +31,45 @@ void initFlagsDefaults(SimFlags* flags)
     flags->suspended = 0;
     flags->pidNotExist = 0;
     flags->rtOutOfRange = 1;
+}
+
+void registerSignalHandler(int signal, void(*handler)(int))
+{
+    struct sigaction sa;
+
+    if(sigemptyset(&sa.sa_mask))
+        errExit("registerSignalHandler: Unable to empty sa_mask");
+
+    if(sigaddset(&sa.sa_mask, signal))
+        errExit("registerSignalHandler: Unable to add signal to sa_mask");
+
+    sa.sa_flags = 0;
+    sa.sa_handler = handler;
+
+    if(sigaction(signal, &sa, NULL))
+        errExit("registerSignalHandler: Unable to register signal handler");
+}
+
+void createTimer(struct sigevent* sevp, timer_t* timerId)
+{
+    sevp->sigev_notify = SIGEV_SIGNAL;
+    sevp->sigev_signo = SIGALRM;
+
+    if(timer_create(CLOCK_REALTIME, sevp, timerId))
+        errExit("createTimer: Unable to create timer.");
+
+}
+
+void armTimer(timer_t timerId, float interval)
+{
+    time_t sec = (time_t)(interval * 100000000) / 1000000000;
+    long nsec = (long)(interval * 100000000) % 1000000000;
+
+    struct timespec ts = { .tv_sec = sec, .tv_nsec = nsec };
+    struct itimerspec value = {.it_interval = ts, .it_value = ts};
+
+    if(timer_settime(timerId, 0, &value, NULL))
+        errExit("armTimer: Unable to arm timer.");
 }
 
 double getTimestampSec()
