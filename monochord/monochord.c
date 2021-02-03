@@ -47,7 +47,7 @@ void initSim(short port, int* sockfd, SimParams* params, SimFlags* flags, char**
 
     armTimer(params->timerId, params->probe);
 
-    *dgramBuf = (char*)calloc(MAX_DGRAM_LEN, MAX_DGRAM_LEN);
+    *dgramBuf = (char*)calloc(MAX_DGRAM_LEN, sizeof(char));
     if(!*dgramBuf)
         errExit("initSim: Unable to allocate diagram buffer");
 }
