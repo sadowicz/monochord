@@ -1,5 +1,3 @@
-#define _POSIX_C_SOURCE 199309L
-
 #include <stdio.h>
 #include <time.h>
 #include <zconf.h>  // TODO: delete
@@ -24,16 +22,76 @@ int main(int argc, char* argv[])
     int sockfd = initSocket(port);
 
     SimParams  params;
-    initParamsDefaults(&params);
-
+    struct sigevent sevp;
+    initParamsDefaults(&params, &sevp);
     SimFlags flags;
     initFlagsDefaults(&flags);
 
+    registerSignalHandler(SIGALRM, alrmHandler);
+    registerSignalHandler(SIGIO, ioHandler);
+
+    //timer_t timerId;
+    //createTimer(&sevp, &timerId);
+    armTimer(params.timerId, params.probe);
+
+    char dgramBuf[MAX_DGRAM_LEN] = {0};
+
+    double sinValue = 0;
+    float timeRemaining = params.period;
     double refPoint = getTimestampSec();
 
-    char buf[512] = {0};
+    while(timeRemaining > 0 || flags.stopped)
+    {
+        flags.suspended = (uint8_t)(flags.stopped == 2 || flags.pidErr || flags.rtOutOfRange);
+        pause();
 
-    while(1)
+        if(io)
+        {
+            io = 0;
+
+            struct sockaddr_in sender = {0};
+            socklen_t senderLen = sizeof(sender);
+
+            if(recvfrom(sockfd, &dgramBuf, sizeof(dgramBuf), MSG_DONTWAIT, (struct sockaddr*)&sender, &senderLen) != -1)
+            {
+                interpretDatagram(dgramBuf, &params, &flags);
+                memset(dgramBuf, 0, sizeof(dgramBuf));
+
+                if(flags.report)
+                {
+                    createReport(dgramBuf, &params, &flags);
+                    if(sendto(sockfd, &dgramBuf, sizeof(dgramBuf), 0, (struct sockaddr*)&sender, senderLen) == -1)
+                        errExit("Unable to send report");
+
+                    flags.report = 0;
+                    memset(dgramBuf, 0, sizeof(dgramBuf));
+                }
+            }
+            else
+                errExit("Unable to receive datagram");
+        }
+
+        if(alrm)
+        {
+            alrm = 0;
+
+            if(!flags.suspended)
+            {
+                sinValue = calcSinusoide(&params, getTimestampSec() - refPoint);
+                sendRtSignal(&params, &flags, &sinValue);
+
+                timeRemaining -= params.probe;
+            }
+        }
+
+        if(flags.reset)
+        {
+            refPoint = getTimestampSec();   // reset reference point
+            armTimer(params.timerId, params.probe);    // reset timer
+        }
+    }
+
+    /*while(1)
     {
         //pause()
         //if(io)
@@ -77,9 +135,10 @@ int main(int argc, char* argv[])
         }
         else
             errExit("Unable to receive datagram");
-    }
+    }*/
 
-    // TODO: close sockfd
+    timer_delete(params.timerId);
+    shutdown(sockfd, SHUT_RDWR);
 
     return 0;
 }

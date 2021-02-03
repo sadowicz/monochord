@@ -78,6 +78,7 @@ void executeRecord(char* name, char* value, SimParams* params, SimFlags* flags)
     else if(!strcmp("probe", name))
     {
         params->probe = strToPosFloat(value);
+        armTimer(params->timerId, params->probe);
     }
     else if(!strcmp("period", name))
     {
@@ -88,11 +89,14 @@ void executeRecord(char* name, char* value, SimParams* params, SimFlags* flags)
         else flags->stopped = 0;
     }
     else if(!strcmp("pid", name))
+    {
         params->pid = strToInt(value);
+        flags->pidErr = 0;  // to try send signal when new pid is set
+    }
     else if(!strcmp("rt", name))
     {
         params->rt = strToInt(value);
-        flags->rtOutOfRange = (uint8_t) (params->rt > SIGRTMIN && params->rt < SIGRTMAX);
+        flags->rtOutOfRange = (uint8_t)(params->rt > SIGRTMIN && params->rt < SIGRTMAX);
     }
     else if(!strcmp("raport", name))
         flags->report = 1;

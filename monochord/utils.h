@@ -1,7 +1,9 @@
-#define _POSIX_C_SOURCE 200809L
-
 #ifndef UTILS_H
 #define UTILS_H
+
+#define _POSIX_C_SOURCE 200809L
+
+#define PI 3.14159265359
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,6 +21,8 @@ typedef struct SimParams {
     // 0 -infinite  /   <0 - pause probing
     pid_t pid;
     int rt;
+
+    timer_t timerId;
 }SimParams;
 
 typedef struct SimFlags {
@@ -33,7 +37,7 @@ typedef struct SimFlags {
 void errExit(const char* msg);
 void usageExit(const char* programName, const char* msg);
 
-void initParamsDefaults(SimParams* params);
+void initParamsDefaults(SimParams* params, struct sigevent* sevp);
 void  initFlagsDefaults(SimFlags* flags);
 
 void registerSignalHandler(int signal, void(*handler)(int));

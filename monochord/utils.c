@@ -1,4 +1,3 @@
-#include <math.h>
 #include "utils.h"
 
 void errExit(const char* msg)
@@ -13,7 +12,7 @@ void usageExit(const char* programName, const char* msg)
     exit(1);
 }
 
-void initParamsDefaults(SimParams* params)
+void initParamsDefaults(SimParams* params, struct sigevent* sevp)
 {
     params->amp = 1.0f;
     params->freq = 0.25f;
@@ -21,6 +20,8 @@ void initParamsDefaults(SimParams* params)
     params->period = -1.0f;
     params->pid = 1;
     params->rt = 0;
+
+    createTimer(sevp, &params->timerId);
 }
 
 void initFlagsDefaults(SimFlags* flags)
@@ -102,7 +103,7 @@ double getTimestampSec()
 
 double calcSinusoide(SimParams* params, double time)
 {
-    return params->amp * sin(2 * M_PI * params->freq * time);
+    return params->amp * sin(2 * PI * params->freq * time);
 }
 
 void createReport(char* report, SimParams* params, SimFlags* flags)
