@@ -32,62 +32,6 @@ int main(int argc, char* argv[])
     performSim(sockfd, &params, &flags, dgramBuf);
     cleanUpSim(sockfd, &params, &dgramBuf);
 
-
-    /*int sockfd = initSocket(port);
-
-    SimParams  params;
-    struct sigevent sevp;
-    initParamsDefaults(&params, &sevp);
-    SimFlags flags;
-    initFlagsDefaults(&flags);
-
-    registerSignalHandler(SIGALRM, alrmNotifier);
-    registerSignalHandler(SIGIO, ioNotifier);
-
-    armTimer(params.timerId, params.probe);
-
-    char dgramBuf[MAX_DGRAM_LEN] = {0};
-
-    double sinValue = 0;
-    float timeRemaining = params.period;
-    double refPoint = getTimestampSec();
-
-    while(timeRemaining > 0 || flags.stopped)
-    {
-        flags.suspended = (uint8_t)(flags.stopped == 2 || flags.pidErr || flags.rtOutOfRange);
-        pause();
-
-        if(io)
-        {
-            io = 0;
-            processSimIO(sockfd, dgramBuf, &params, &flags);
-        }
-
-        if(alrm)
-        {
-            alrm = 0;
-
-            if(!flags.suspended)
-            {
-                sinValue = calcSinusoide(&params, getTimestampSec() - refPoint);
-                sendRtSignal(&params, &flags, &sinValue);
-
-                timeRemaining -= params.probe;
-            }
-        }
-
-        if(flags.reset)
-        {
-            refPoint = getTimestampSec();   // reset reference point
-            armTimer(params.timerId, params.probe);    // reset timer
-        }
-    }
-
-    free(dgramBuf);
-    timer_delete(params.timerId);
-    shutdown(sockfd, SHUT_RDWR);
-*/
-
     return 0;
 }
 
@@ -123,27 +67,6 @@ void performSim(int sockfd, SimParams* params, SimFlags* flags, char* dgramBuf)
         {
             io = 0;
             processSimIO(sockfd, dgramBuf, params, flags);
-
-            /*struct sockaddr_in sender = {0};
-            socklen_t senderLen = sizeof(sender);
-
-            if(recvfrom(sockfd, &dgramBuf, sizeof(dgramBuf), MSG_DONTWAIT, (struct sockaddr*)&sender, &senderLen) != -1)
-            {
-                interpretDatagram(dgramBuf, &params, &flags);
-                memset(dgramBuf, 0, sizeof(dgramBuf));
-
-                if(flags.report)
-                {
-                    createReport(dgramBuf, &params, &flags);
-                    if(sendto(sockfd, &dgramBuf, sizeof(dgramBuf), 0, (struct sockaddr*)&sender, senderLen) == -1)
-                        errExit("Unable to send report");
-
-                    flags.report = 0;
-                    memset(dgramBuf, 0, sizeof(dgramBuf));
-                }
-            }
-            else
-                errExit("Unable to receive datagram");*/
         }
 
         if(alrm)
