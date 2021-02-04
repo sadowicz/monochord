@@ -71,6 +71,18 @@ int codeFlags(ProgramFlags* flags)
     return code;
 }
 
+void writeRecordBin(int fd, struct timespec* timestamp, float* data, pid_t* pid)
+{
+    if(write(fd, timestamp, sizeof(struct timespec)))
+        errExit("writeRecordBin: Unable to write timestamp.");
+
+    if(write(fd, data, sizeof(float)))
+        errExit("writeRecordBin: Unable to write data.");
+
+    if(write(fd, pid, sizeof(pid_t)))
+        errExit("writeRecordBin: Unable to write pid.");
+}
+
 void writeTimestampGlobal(int fd)
 {
     struct timespec ts;

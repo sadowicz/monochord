@@ -4,7 +4,7 @@
 #define _POSIX_C_SOURCE 199309L
 #define _DEFAULT_SOURCE
 
-#define MAX_TIMESTAMP_LEN 32
+#define MAX_TIMESTAMP_LEN 64
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -39,6 +39,8 @@ void sendInfo(pid_t pid, int signal, int info);
 int openFile(char* path);
 
 int codeFlags(ProgramFlags* flags);
+
+void writeRecordBin(int fd, struct timespec* timestamp, float* data, pid_t* pid);
 
 void writeTimestampGlobal(int fd);
 void writeTimestampLocal(int fd, struct timespec* refPoint);
