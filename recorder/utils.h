@@ -2,8 +2,7 @@
 #define UTILS_H
 
 #define _POSIX_C_SOURCE 199309L
-#define _BSD_SOURCE
-#define _SVID_SOURCE
+#define _DEFAULT_SOURCE
 
 #define MAX_TIMESTAMP_LEN 32
 
@@ -35,8 +34,11 @@ void errExit(const char* msg);
 void usageExit(const char* programName, const char* msg);
 
 void registerSignalHandler(int signal, void (*handler)(int, siginfo_t*, void *));
+void sendInfo(pid_t pid, int signal, int info);
 
 int openFile(char* path);
+
+int codeFlags(ProgramFlags* flags);
 
 void writeTimestampGlobal(int fd);
 void writeTimestampLocal(int fd, struct timespec* refPoint);

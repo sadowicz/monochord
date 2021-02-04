@@ -29,6 +29,15 @@ void registerSignalHandler(int signal, void (*handler)(int, siginfo_t*, void *))
         errExit("registerSignalHandler: Unable to register signal handler");
 }
 
+void sendInfo(pid_t pid, int signal, int info)
+{
+    union sigval sval;
+    sval.sival_int = info;
+
+    if(sigqueue(pid, signal, sval))
+        errExit("sendInfo: Unable to send signal");
+}
+
 int openFile(char* path)
 {
     int fd = STDOUT_FILENO;
@@ -44,6 +53,22 @@ int openFile(char* path)
     }
 
     return fd;
+}
+
+int codeFlags(ProgramFlags* flags)
+{
+    int code = 0;
+
+    if(!flags->stopped)
+        code |= 0x1;    // 0001
+    if(flags->useRefPoint)
+        code |= 0x2;    // 0010
+    if(flags->usePid)
+        code |= 0x4;    // 0100
+    if(flags->useBin)
+        code |= 0x8;    // 1000
+
+    return code;
 }
 
 void writeTimestampGlobal(int fd)
