@@ -13,11 +13,17 @@
 #include <time.h>
 #include <unistd.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
 
 void errExit(const char* msg);
 void usageExit(const char* programName, const char* msg);
 
 void registerSignalHandler(int signal, void (*handler)(int, siginfo_t*, void *));
+
+int openFile(char* path);
 
 void writeTimestampGlobal(int fd);
 void writeTimestampLocal(int fd, struct timespec* refPoint);

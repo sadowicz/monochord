@@ -29,6 +29,23 @@ void registerSignalHandler(int signal, void (*handler)(int, siginfo_t*, void *))
         errExit("registerSignalHandler: Unable to register signal handler");
 }
 
+int openFile(char* path)
+{
+    int fd = STDOUT_FILENO;
+
+    if(strcmp(path, "-"))
+    {
+        int flags = O_WRONLY | O_CREAT | O_TRUNC;
+        mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
+
+        fd = open(path, flags, mode);
+        if(fd == -1)
+            errExit("openFile: Unable to open/create file");
+    }
+
+    return fd;
+}
+
 void writeTimestampGlobal(int fd)
 {
     struct timespec ts;
