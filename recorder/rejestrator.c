@@ -6,8 +6,8 @@
 void dataSignalNotifier(int signo, siginfo_t* siginfo, void* data);
 void cmdSignalNotifier(int signo, siginfo_t* siginfo, void* data);
 
-DataSig dataSigInfo = {0, 0.0f};
-CmdSig cmdSigInfo = {0, 0, 0};
+SigInfo dataSigInfo = {0, 0, 0};
+SigInfo cmdSigInfo = {0, 0, 0};
 
 int main(int argc, char* argv[])
 {
@@ -29,7 +29,8 @@ int main(int argc, char* argv[])
 void dataSignalNotifier(int signo, siginfo_t* siginfo, void* data)
 {
     dataSigInfo.notified = 1;
-    memcpy(&dataSigInfo.data, &siginfo->si_value.sival_int, sizeof(float)); // copy int to float to interpret its value as float
+    dataSigInfo.data = siginfo->si_value.sival_int;
+    dataSigInfo.senderPid = siginfo->si_pid;
 }
 
 void cmdSignalNotifier(int signo, siginfo_t* siginfo, void* data)

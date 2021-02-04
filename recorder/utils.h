@@ -17,16 +17,19 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-typedef struct DataSig {
-    volatile sig_atomic_t notified;
-    volatile float data;
-}DataSig;
-
-typedef struct CmdSig {
+typedef struct SigInfo {
     volatile sig_atomic_t notified;
     volatile sig_atomic_t data;
     volatile pid_t senderPid;
-}CmdSig;
+}SigInfo;
+
+typedef struct ProgramFlags {
+    int stopped;
+    int useRefPoint;
+    int updateRefPoint;
+    int usePid;
+    int useBin;
+}ProgramFlags;
 
 void errExit(const char* msg);
 void usageExit(const char* programName, const char* msg);
