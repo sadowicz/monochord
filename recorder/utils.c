@@ -29,6 +29,27 @@ void registerSignalHandler(int signal, void (*handler)(int, siginfo_t*, void *))
         errExit("registerSignalHandler: Unable to register signal handler");
 }
 
+void ignoreSignal(int sig)
+{
+     if(signal(sig, SIG_IGN) == SIG_ERR)
+         errExit("ignoreSignal: Unable to set signal handling to ignore.");
+}
+
+int isSignalIgnored(int signal)
+{
+    int res = 0;
+
+    struct sigaction sa;
+
+    if(sigaction(signal, NULL, &sa))
+        errExit("isSignalIgnored: Unable to get signal old sigaction.");
+
+    if(!(sa.sa_flags & SA_SIGINFO))
+        res = (sa.sa_handler == SIG_IGN);
+
+    return res;
+}
+
 void sendInfo(pid_t pid, int signal, int info)
 {
     union sigval sval;

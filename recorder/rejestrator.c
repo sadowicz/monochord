@@ -35,7 +35,8 @@ int main(int argc, char* argv[])
 
     struct timespec refPoint;
 
-    registerSignalHandler(dataSig, dataSignalNotifier);
+    //registerSignalHandler(dataSig, dataSignalNotifier);
+    ignoreSignal(dataSig);  // instead of blocking, for signal not be queued
     registerSignalHandler(cmdSig, cmdSignalNotifier);
 
     while(1)
@@ -50,7 +51,7 @@ int main(int argc, char* argv[])
 
             if(flags.stopped)
             {
-                //TODO: Lock data signal handling here
+                ignoreSignal(dataSig);  // instead of blocking, for signal not be queued
             }
             else if(flags.sendInfo)
             {
@@ -60,10 +61,8 @@ int main(int argc, char* argv[])
             }
             else    // Start command
             {
-                if(!dataSigInfo.notified) // resume handling  ????
-                {
-                    //TODO: Unlock data signal handling here
-                }
+                if(isSignalIgnored(dataSig)) // reset handler function (start handling)
+                    registerSignalHandler(dataSig, dataSignalNotifier);
 
                 if(flags.truncFiles)
                 {
@@ -73,7 +72,7 @@ int main(int argc, char* argv[])
                         truncFile(binFd);
                 }
 
-                // update refpoint or create one if old ref is demanded and it not exsists:
+                // update refpoint or create one if old ref is demanded and it not exists:
                 if(flags.updateRefPoint ||(flags.useRefPoint && !flags.hasRefPoint))
                 {
                     flags.updateRefPoint = 0;

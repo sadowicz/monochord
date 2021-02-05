@@ -21,7 +21,7 @@
 typedef struct SigInfo {
     volatile sig_atomic_t notified;
     volatile sig_atomic_t data;
-    volatile pid_t senderPid;
+    volatile sig_atomic_t senderPid;
 }SigInfo;
 
 typedef struct ProgramFlags {
@@ -40,6 +40,8 @@ void errExit(const char* msg);
 void usageExit(const char* programName, const char* msg);
 
 void registerSignalHandler(int signal, void (*handler)(int, siginfo_t*, void *));
+void ignoreSignal(int sig);
+int isSignalIgnored(int signal);
 void sendInfo(pid_t pid, int signal, int info);
 
 int codeFlags(ProgramFlags* flags);
