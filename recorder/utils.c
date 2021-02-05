@@ -38,23 +38,6 @@ void sendInfo(pid_t pid, int signal, int info)
         errExit("sendInfo: Unable to send signal");
 }
 
-int openFile(char* path)
-{
-    int fd = STDOUT_FILENO;
-
-    if(strcmp(path, "-"))
-    {
-        int flags = O_WRONLY | O_CREAT | O_TRUNC;
-        mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
-
-        fd = open(path, flags, mode);
-        if(fd == -1)
-            errExit("openFile: Unable to open/create file");
-    }
-
-    return fd;
-}
-
 int codeFlags(ProgramFlags* flags)
 {
     int code = 0;
@@ -112,63 +95,98 @@ void decodeCmd(int cmdData, ProgramFlags* flags)
     }
 }
 
+int openFile(char* path)
+{
+    int fd = STDOUT_FILENO;
+
+    if(strcmp(path, "-"))
+    {
+        int flags = O_WRONLY | O_CREAT | O_TRUNC;
+        mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
+
+        fd = open(path, flags, mode);
+        if(fd == -1)
+            errExit("openFile: Unable to open/create file");
+    }
+
+    return fd;
+}
+
+void writeRecordTxt(int fd, struct timespec* timestamp, float data, pid_t* pid, ProgramFlags* flags)
+{
+    char* buffer = calloc(MAX_RECORD_LEN, sizeof(char));
+    if(!buffer)
+        errExit("writeRecordTxt: Unable to allocate write buffer.");
+
+    if(flags->useRefPoint)
+        getStrTimestampGlobal(timestamp, buffer);
+    else
+        getStrTimestampLocal(timestamp, buffer);
+
+    if(sprintf(buffer + strlen(buffer), " %f", data) <= 0 )
+        errExit("writeRecordTxt: Unable to write float data into buffer.");
+
+    if(flags->usePid)
+    {
+        if(!pid)
+            errExit("writeRecordTxt: No pid given");
+
+        if(sprintf(buffer + strlen(buffer), " %d", *pid) <= 0 )
+            errExit("writeRecordTxt: Unable to write pid into buffer.");
+    }
+
+    if(sprintf(buffer + strlen(buffer), "\n") <= 0 )
+        errExit("writeRecordTxt: Unable to write record separator into buffer.");
+
+    if(write(fd, buffer, strlen(buffer)) == -1)
+        errExit("writeRecordTxt: Unable to write buffer into text file.");
+
+    free(buffer);
+}
+
 void writeRecordBin(int fd, struct timespec* timestamp, float* data, pid_t* pid)
 {
-    if(write(fd, timestamp, sizeof(struct timespec)))
+    if(write(fd, timestamp, sizeof(struct timespec)) == -1)
         errExit("writeRecordBin: Unable to write timestamp.");
 
-    if(write(fd, data, sizeof(float)))
+    if(write(fd, data, sizeof(float)) == -1)
         errExit("writeRecordBin: Unable to write data.");
 
-    if(write(fd, pid, sizeof(pid_t)))
+    if(write(fd, pid, sizeof(pid_t)) == -1)
         errExit("writeRecordBin: Unable to write pid.");
 }
 
-void writeTimestampGlobal(int fd)
+void getStrTimestampGlobal(struct timespec* timestamp, char* buffer)
 {
-    struct timespec ts;
-
-    if(clock_gettime(CLOCK_REALTIME, &ts))
-        errExit("writeTimestampGlobal: Unable to get clock value");
-
     struct tm readable;
 
-    if(!localtime_r(&(ts.tv_sec), &readable))
-        errExit("writeTimestampGlobal: Unable to get human readable time values");
+    if(!localtime_r(&(timestamp->tv_sec), &readable))
+        errExit("getStrTimestampGlobal: Unable to get human readable time values");
 
-    char buf[MAX_TIMESTAMP_LEN] = {0};
+    long milliseconds = timestamp->tv_nsec / 1000000;
 
-    long milliseconds = ts.tv_nsec / 1000000;
-
-    sprintf(buf, "%d:%d:%d.%ld",
+    // dd/mm/yyyy HH:MM:SS.MS
+    int written = sprintf(buffer, "%d/%d/%d %d:%d:%d.%ld",
+            readable.tm_mday, readable.tm_mon + 1, readable.tm_year + 1900,
             readable.tm_hour, readable.tm_min, readable.tm_sec, milliseconds);
 
-    if(write(fd, buf, strlen(buf)) == -1)
-        errExit("writeTimestampGlobal: Unable to write timestamp to file");
+    if(written <= 0)
+        errExit("getStrTimestampGlobal: Unable to write timestamp to buffer");
 }
 
-void writeTimestampLocal(int fd, struct timespec* refPoint)
+void getStrTimestampLocal(struct timespec* timestamp, char* buffer)
 {
-    struct timespec diff;
-    struct timespec curr;
+    time_t hours = timestamp->tv_sec / 3600;
+    time_t mins = (timestamp->tv_sec % 3600) / 60;
+    time_t sec = ((timestamp->tv_sec % 3600) % 60) / 60;
+    long milliseconds = timestamp->tv_nsec / 1000000;
 
-    if(clock_gettime(CLOCK_MONOTONIC, &curr))
-        errExit("writeTimestampLocal: Unable to get clock value");
-
-    getTimestampDiff(&diff, refPoint, &curr);
-
-    time_t hours = diff.tv_sec / 3600;
-    time_t mins = (diff.tv_sec % 3600) / 60;
-    time_t sec = ((diff.tv_sec % 3600) % 60) / 60;
-    long milliseconds = diff.tv_nsec / 1000000;
-
-    char buf[MAX_TIMESTAMP_LEN] = {0};
-
-    sprintf(buf, "%ld:%ld:%ld.%ld",
+    // cH:MM:SS.MS
+    int written = sprintf(buffer, "%ld:%ld:%ld.%ld",
             hours, mins, sec, milliseconds);
 
-    if(write(fd, buf, strlen(buf)) == -1)
-        errExit("writeTimestampLocal: Unable to write timestamp to file");
+    if(written <= 0)
+        errExit("getStrTimestampLocal: Unable to write timestamp to buffer");
 }
 
 void getTimestampDiff(struct timespec* res, struct timespec* earlier, struct timespec* later)
