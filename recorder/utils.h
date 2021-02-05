@@ -42,6 +42,8 @@ void usageExit(const char* programName, const char* msg);
 void registerSignalHandler(int signal, void (*handler)(int, siginfo_t*, void *));
 void ignoreSignal(int sig);
 int isSignalIgnored(int signal);
+void blockSignal(int signal, sigset_t* backup);
+void unblockSignal(int signal, sigset_t* restore);
 void sendInfo(pid_t pid, int signal, int info);
 
 int codeFlags(ProgramFlags* flags);

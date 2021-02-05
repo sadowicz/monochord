@@ -3,9 +3,6 @@
 #include "utils.h"
 #include "parse.h"
 
-//TODO: Block data signal until finished all actions based on it (eg. in while)
-//TODO: Block cmd signal until finished all actions based on it (eg. in while)
-
 void dataSignalNotifier(int signo, siginfo_t* siginfo, void* data);
 void cmdSignalNotifier(int signo, siginfo_t* siginfo, void* data);
 
@@ -35,7 +32,6 @@ int main(int argc, char* argv[])
 
     struct timespec refPoint;
 
-    //registerSignalHandler(dataSig, dataSignalNotifier);
     ignoreSignal(dataSig);  // instead of blocking, for signal not be queued
     registerSignalHandler(cmdSig, cmdSignalNotifier);
 
@@ -45,6 +41,9 @@ int main(int argc, char* argv[])
 
         if(cmdSigInfo.notified)
         {
+            sigset_t backup;
+            blockSignal(cmdSig, &backup);  // block handling of cmd signals (enter "critical section")
+
             cmdSigInfo.notified = 0;
 
             decodeCmd(cmdSigInfo.data, &flags);
@@ -80,11 +79,14 @@ int main(int argc, char* argv[])
                 }
             }
 
-            //TODO: Unlock cmd signal handling here
+            unblockSignal(cmdSig, &backup); // unblock handling of cmd signal (left "critical section")
         }
 
         if(dataSigInfo.notified)
         {
+            sigset_t backup;
+            blockSignal(dataSig, &backup);  // block handling of data signals (enter "critical section")
+
             dataSigInfo.notified = 0;
             float value;
             memcpy(&value, (void*)&dataSigInfo.data, sizeof(float));    // way to interpret non float 4-byte as float
@@ -110,8 +112,7 @@ int main(int argc, char* argv[])
             if(flags.useBin)
                 writeRecordBin(binFd, &timestamp, &value, &pid);
 
-            //TODO: Unlock data signal handling here
-
+            unblockSignal(dataSig, &backup); // unblock handling of data signal (left "critical section")
         }
 
     }
@@ -126,8 +127,6 @@ void dataSignalNotifier(int signo, siginfo_t* siginfo, void* data)
     dataSigInfo.notified = 1;
     dataSigInfo.data = siginfo->si_value.sival_int;
     dataSigInfo.senderPid = siginfo->si_pid;
-
-    //TODO: Lock data signal handling here
 }
 
 void cmdSignalNotifier(int signo, siginfo_t* siginfo, void* data)
@@ -135,6 +134,4 @@ void cmdSignalNotifier(int signo, siginfo_t* siginfo, void* data)
     cmdSigInfo.notified = 1;
     cmdSigInfo.data = siginfo->si_value.sival_int;
     cmdSigInfo.senderPid = siginfo->si_pid;
-
-    //TODO: Lock cmd signal handling here
 }

@@ -50,6 +50,25 @@ int isSignalIgnored(int signal)
     return res;
 }
 
+void blockSignal(int signal, sigset_t* backup)
+{
+    sigset_t block;
+    if(sigemptyset(&block))
+        errExit("blockSignal: Unable to empty block set.");
+
+    if(sigaddset(&block, signal))
+        errExit("blockSignal: Unable to add signal to block set.");
+
+    if(sigprocmask(SIG_BLOCK, &block, backup))
+        errExit("blockSignal: Unable to set mask to block set.");
+}
+
+void unblockSignal(int signal, sigset_t* restore)
+{
+    if(sigprocmask(SIG_SETMASK, restore, NULL))
+        errExit("unblockSignal: Unable to restore old mask.");
+}
+
 void sendInfo(pid_t pid, int signal, int info)
 {
     union sigval sval;
