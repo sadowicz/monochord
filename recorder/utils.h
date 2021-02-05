@@ -48,6 +48,8 @@ void writeRecordBin(int fd, struct timespec* timestamp, float* data, pid_t* pid)
 
 void getStrTimestampGlobal(struct timespec* timestamp, char* buffer);
 void getStrTimestampLocal(struct timespec* timestamp, char* buffer);
+
+void getTimestamp(clockid_t clockType, struct timespec* timestamp);
 void getTimestampDiff(struct timespec* res, struct timespec* earlier, struct timespec* later);
 
 #endif

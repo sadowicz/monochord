@@ -189,6 +189,12 @@ void getStrTimestampLocal(struct timespec* timestamp, char* buffer)
         errExit("getStrTimestampLocal: Unable to write timestamp to buffer");
 }
 
+void getTimestamp(clockid_t clockType, struct timespec* timestamp)
+{
+    if(clock_gettime(clockType, timestamp))
+        errExit("getTimestamp: Unable to get timestamp for given clock");
+}
+
 void getTimestampDiff(struct timespec* res, struct timespec* earlier, struct timespec* later)
 {
     res->tv_sec = later->tv_sec - earlier->tv_sec;
