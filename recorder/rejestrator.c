@@ -68,11 +68,9 @@ int main(int argc, char* argv[])
                 if(flags.truncFiles)
                 {
                     flags.truncFiles = 0;
-                    //TODO: trunc text file
+                    truncFile(txtFd);
                     if(flags.useBin)
-                    {
-                        //TODO: trunc bin file
-                    }
+                        truncFile(binFd);
                 }
 
                 // update refpoint or create one if old ref is demanded and it not exsists:

@@ -112,6 +112,18 @@ int openFile(char* path)
     return fd;
 }
 
+void truncFile(int fd)
+{
+    if(fd != STDOUT_FILENO)
+    {
+        if(ftruncate(fd, 0))
+            errExit("truncFile: Unable to truncate file length.");
+
+        if(lseek(fd, 0, SEEK_SET) == -1)
+            errExit("truncFile: Unable to set file offset at file beginning.");
+    }
+}
+
 void writeRecordTxt(int fd, struct timespec* timestamp, float data, pid_t pid, ProgramFlags* flags)
 {
     char* buffer = calloc(MAX_RECORD_LEN, sizeof(char));
