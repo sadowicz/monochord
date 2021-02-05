@@ -71,6 +71,47 @@ int codeFlags(ProgramFlags* flags)
     return code;
 }
 
+void decodeCmd(int cmdData, ProgramFlags* flags)
+{
+    switch(cmdData)
+    {
+        case 0:
+            flags->stopped = 1;
+            break;
+        case 255:
+            flags->sendInfo = 1;
+            break;
+        default:
+        {
+            flags->stopped = 0;
+
+            if(cmdData - 8 >= 0)
+            {
+                flags->truncFiles = 1;
+                cmdData -= 8;
+            }
+
+            if(cmdData - 4 >= 0)
+            {
+                flags->usePid = 1;
+                cmdData -= 4;
+            }
+
+            if(cmdData == 3)
+                flags->useRefPoint = 1;
+            else if(cmdData == 2)
+            {
+                flags->useRefPoint = 1;
+                flags->updateRefPoint = 1;
+            }
+            else if(cmdData < 1)
+                errExit("decodeCmd: Invalid command value");
+
+            break;
+        }
+    }
+}
+
 void writeRecordBin(int fd, struct timespec* timestamp, float* data, pid_t* pid)
 {
     if(write(fd, timestamp, sizeof(struct timespec)))

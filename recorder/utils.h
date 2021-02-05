@@ -25,10 +25,13 @@ typedef struct SigInfo {
 typedef struct ProgramFlags {
     int stopped;
     int useRefPoint;
-    int updateRefPoint;
     int usePid;
     int useBin;
+    int updateRefPoint;
+    int truncFiles;
+    int sendInfo;
 }ProgramFlags;
+
 
 void errExit(const char* msg);
 void usageExit(const char* programName, const char* msg);
@@ -39,6 +42,7 @@ void sendInfo(pid_t pid, int signal, int info);
 int openFile(char* path);
 
 int codeFlags(ProgramFlags* flags);
+void decodeCmd(int cmdData, ProgramFlags* flags);
 
 void writeRecordBin(int fd, struct timespec* timestamp, float* data, pid_t* pid);
 
