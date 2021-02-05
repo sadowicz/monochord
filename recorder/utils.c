@@ -112,7 +112,7 @@ int openFile(char* path)
     return fd;
 }
 
-void writeRecordTxt(int fd, struct timespec* timestamp, float data, pid_t* pid, ProgramFlags* flags)
+void writeRecordTxt(int fd, struct timespec* timestamp, float data, pid_t pid, ProgramFlags* flags)
 {
     char* buffer = calloc(MAX_RECORD_LEN, sizeof(char));
     if(!buffer)
@@ -128,10 +128,10 @@ void writeRecordTxt(int fd, struct timespec* timestamp, float data, pid_t* pid, 
 
     if(flags->usePid)
     {
-        if(!pid)
+        if(pid == -1)
             errExit("writeRecordTxt: No pid given");
 
-        if(sprintf(buffer + strlen(buffer), " %d", *pid) <= 0 )
+        if(sprintf(buffer + strlen(buffer), " %d", pid) <= 0 )
             errExit("writeRecordTxt: Unable to write pid into buffer.");
     }
 

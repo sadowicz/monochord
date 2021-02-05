@@ -1,6 +1,6 @@
 #include "parse.h"
 
-void parseArgs(int argc, char** argv, int* dataSig, int* cmdSig, char** binPath, char** txtPath)
+void parseArgs(int argc, char** argv, int* dataSig, int* cmdSig, char** binPath, char** txtPath, int* useBinFlag)
 {
     int opt;
 
@@ -29,6 +29,9 @@ void parseArgs(int argc, char** argv, int* dataSig, int* cmdSig, char** binPath,
 
     if(!*txtPath)   // init txtPath with default value if no value was given in argv
         initPath(txtPath, "-");
+
+    if(*binPath)    // binary file path was given
+        *useBinFlag = 1;
 
     if(*dataSig == -1 || *cmdSig == -1)
         errExit("parseArgs: Missing non optional argument.");

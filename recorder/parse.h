@@ -13,7 +13,7 @@
 
 #include "utils.h"
 
-void parseArgs(int argc, char** argv, int* dataSig, int* cmdSig, char** binPath, char** txtPath);
+void parseArgs(int argc, char** argv, int* dataSig, int* cmdSig, char** binPath, char** txtPath, int* useBinFlag);
 
 void initPath(char** path, char* value);
 int strToRtSig(char* str);

@@ -23,13 +23,14 @@ typedef struct SigInfo {
 }SigInfo;
 
 typedef struct ProgramFlags {
-    int stopped;
+    int stopped;    // default 1 (stopped)
     int useRefPoint;
     int usePid;
     int useBin;
     int updateRefPoint;
     int truncFiles;
     int sendInfo;
+    int hasRefPoint;
 }ProgramFlags;
 
 
@@ -43,7 +44,8 @@ int codeFlags(ProgramFlags* flags);
 void decodeCmd(int cmdData, ProgramFlags* flags);
 
 int openFile(char* path);
-void writeRecordTxt(int fd, struct timespec* timestamp, float data, pid_t* pid, ProgramFlags* flags);
+void truncFile(int fd);
+void writeRecordTxt(int fd, struct timespec* timestamp, float data, pid_t pid, ProgramFlags* flags);
 void writeRecordBin(int fd, struct timespec* timestamp, float* data, pid_t* pid);
 
 void getStrTimestampGlobal(struct timespec* timestamp, char* buffer);
