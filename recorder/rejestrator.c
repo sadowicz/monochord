@@ -125,6 +125,7 @@ void executeStartCmd(int txtFd, char* txtPath, int binFd, char* binPath, int dat
     {
         flags->updateRefPoint = 0;
         getTimestamp(CLOCK_MONOTONIC, refPoint);
+        flags->hasRefPoint = 1;
     }
 }
 
