@@ -95,6 +95,18 @@ int collectInfo(int signal)
     return siginfo.si_value.sival_int;  // return coded info
 }
 
+void decodeInfo(int codedInfo, Info* decodedInfo)
+{
+    if(codedInfo & 0x1)     // 0001
+        decodedInfo->recordingActive = 1;
+    if(codedInfo & 0x2)     // 0010
+        decodedInfo->refPointUsed = 1;
+    if(codedInfo & 0x4)     // 0100
+        decodedInfo->pidUsed = 1;
+    if(codedInfo & 0x8)     // 1000
+        decodedInfo->binUsed = 1;
+}
+
 int strToInt(char* str)
 {
     char* endptr = NULL;
