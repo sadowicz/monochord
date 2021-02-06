@@ -23,7 +23,7 @@ void parseArgs(int argc, char** argv, int* sig, pid_t* pid)
         switch(opt)
         {
             case 'c':
-                *sig = strToSig(optarg);
+                *sig = strToRtSig(optarg);
                 break;
             case 1:
                 *pid = strToInt(optarg);
@@ -39,6 +39,15 @@ void parseArgs(int argc, char** argv, int* sig, pid_t* pid)
         errExit("parseArgs: Non optional -c argument not given.");
 }
 
+void sendInfoRequest(int signal, pid_t pid)
+{
+    union sigval val;
+    val.sival_int = 255;
+
+    if(sigqueue(pid, signal, val))
+        errExit("sendInfoRequest: Unable to send signal with info request.");
+}
+
 int strToInt(char* str)
 {
     char* endptr = NULL;
@@ -52,11 +61,11 @@ int strToInt(char* str)
     return (int)res;
 }
 
-int strToSig(char* str)
+int strToRtSig(char* str)
 {
     int sig = strToInt(str);
-    if(sig <= 0 || sig > SIGRTMAX)
-        errExit("strToSig: Signal number out of range");    // not specified if program must accept only rt signals
+    if(sig < SIGRTMIN || sig > SIGRTMAX)
+        errExit("strToSig: Signal number out of range");
 
     return sig;
 }

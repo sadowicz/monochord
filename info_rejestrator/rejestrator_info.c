@@ -11,7 +11,7 @@ int main(int argc, char* argv[])
     pid_t pid;
 
     parseArgs(argc, argv, &sig, &pid);
-    
+
 
     return 0;
 }
