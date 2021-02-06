@@ -129,7 +129,7 @@ void decodeCmd(int cmdData, ProgramFlags* flags)
                 flags->useRefPoint = 1;
                 flags->updateRefPoint = 1;
             }
-            else if(cmdData < 1)
+            else if(cmdData != 1)
                 errExit("decodeCmd: Invalid command value");
 
             break;
