@@ -154,11 +154,11 @@ int openFile(char* path)
     return fd;
 }
 
-void truncFile(int fd)
+void truncFile(int fd, char* path)
 {
     if(fd != STDOUT_FILENO)
     {
-        if(ftruncate(fd, 0))
+        if(truncate(path, 0))
             errExit("truncFile: Unable to truncate file length.");
 
         if(lseek(fd, 0, SEEK_SET) == -1)

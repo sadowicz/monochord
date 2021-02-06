@@ -50,7 +50,7 @@ int codeFlags(ProgramFlags* flags);
 void decodeCmd(int cmdData, ProgramFlags* flags);
 
 int openFile(char* path);
-void truncFile(int fd);
+void truncFile(int fd, char* path);
 void writeRecordTxt(int fd, struct timespec* timestamp, float data, pid_t pid, ProgramFlags* flags);
 void writeRecordBin(int fd, struct timespec* timestamp, float* data, pid_t* pid);
 

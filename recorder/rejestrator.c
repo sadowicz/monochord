@@ -10,10 +10,10 @@
 
 void openFiles(int* txtFd, char* txtPath, int* binFd, char* binPath, int useBinFlag);
 
-void runRecorder(int dataSig, int cmdSig, int txtFd, int binFd, ProgramFlags* flags);
+void runRecorder(int dataSig, int cmdSig, int txtFd, char* txtPath, int binFd, char* binPath, ProgramFlags* flags);
 
-void executeCmd(int txtFd, int binFd, int dataSig, int cmdSig, struct timespec* refPoint, ProgramFlags* flags);
-void executeStartCmd(int txtFd, int binFd, int dataSig, struct timespec* refPoint, ProgramFlags* flags);
+void executeCmd(int txtFd, char* txtPath, int binFd, char* binPath, int dataSig, int cmdSig, struct timespec* refPoint, ProgramFlags* flags);
+void executeStartCmd(int txtFd, char* txtPath, int binFd, char* binPath, int dataSig, struct timespec* refPoint, ProgramFlags* flags);
 
 void saveData(int txtFd, int binFd, struct timespec* refPoint, ProgramFlags* flags);
 
@@ -43,7 +43,7 @@ int main(int argc, char* argv[])
     ignoreSignal(dataSig);  // instead of blocking, for signal not to be queued
     registerSignalHandler(cmdSig, cmdSignalNotifier);
 
-    runRecorder(dataSig, cmdSig, txtFd, binFd, &flags);
+    runRecorder(dataSig, cmdSig, txtFd, txtPath, binFd, binPath, &flags);
 
     // No need to close files here because the only way to exit is to terminate
 
@@ -57,7 +57,7 @@ void openFiles(int* txtFd, char* txtPath, int* binFd, char* binPath, int useBinF
         *binFd = openFile(binPath);
 }
 
-void runRecorder(int dataSig, int cmdSig, int txtFd, int binFd, ProgramFlags* flags)
+void runRecorder(int dataSig, int cmdSig, int txtFd, char* txtPath, int binFd, char* binPath, ProgramFlags* flags)
 {
     struct timespec refPoint;
 
@@ -70,7 +70,7 @@ void runRecorder(int dataSig, int cmdSig, int txtFd, int binFd, ProgramFlags* fl
             sigset_t backup;
             blockSignal(cmdSig, &backup);  // block handling of cmd signals (enter "critical section")
 
-            executeCmd(txtFd, binFd, dataSig, cmdSig, &refPoint, flags);
+            executeCmd(txtFd, txtPath, binFd, binPath, dataSig, cmdSig, &refPoint, flags);
 
             unblockSignal(cmdSig, &backup); // unblock handling of cmd signal (left "critical section")
         }
@@ -87,7 +87,7 @@ void runRecorder(int dataSig, int cmdSig, int txtFd, int binFd, ProgramFlags* fl
     }
 }
 
-void executeCmd(int txtFd, int binFd, int dataSig, int cmdSig, struct timespec* refPoint, ProgramFlags* flags)
+void executeCmd(int txtFd, char* txtPath, int binFd, char* binPath, int dataSig, int cmdSig, struct timespec* refPoint, ProgramFlags* flags)
 {
     cmdSigInfo.notified = 0;
 
@@ -104,10 +104,10 @@ void executeCmd(int txtFd, int binFd, int dataSig, int cmdSig, struct timespec* 
         sendInfo(cmdSigInfo.senderPid, cmdSig, info);
     }
     else    // Start command
-        executeStartCmd(txtFd, binFd, dataSig, refPoint, flags);
+        executeStartCmd(txtFd, txtPath, binFd, binPath, dataSig, refPoint, flags);
 }
 
-void executeStartCmd(int txtFd, int binFd, int dataSig, struct timespec* refPoint, ProgramFlags* flags)
+void executeStartCmd(int txtFd, char* txtPath, int binFd, char* binPath, int dataSig, struct timespec* refPoint, ProgramFlags* flags)
 {
     if(isSignalIgnored(dataSig)) // reset handler function (start handling)
         registerSignalHandler(dataSig, dataSignalNotifier);
@@ -115,9 +115,9 @@ void executeStartCmd(int txtFd, int binFd, int dataSig, struct timespec* refPoin
     if(flags->truncFiles)
     {
         flags->truncFiles = 0;
-        truncFile(txtFd);
+        truncFile(txtFd, txtPath);
         if(flags->useBin)
-            truncFile(binFd);
+            truncFile(binFd, binPath);
     }
 
     // update refpoint or create one if old ref is demanded and it not exists:
