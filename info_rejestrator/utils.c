@@ -39,6 +39,23 @@ void parseArgs(int argc, char** argv, int* sig, pid_t* pid)
         errExit("parseArgs: Non optional -c argument not given.");
 }
 
+void registerSignalHandler(int signal, void (*handler)(int, siginfo_t*, void *))
+{
+    struct sigaction sa;
+
+    if(sigemptyset(&sa.sa_mask))
+        errExit("registerSignalHandler: Unable to empty sa_mask");
+
+    if(sigaddset(&sa.sa_mask, signal))
+        errExit("registerSignalHandler: Unable to add signal to sa_mask");
+
+    sa.sa_flags = SA_SIGINFO;
+    sa.sa_sigaction = handler;
+
+    if(sigaction(signal, &sa, NULL))
+        errExit("registerSignalHandler: Unable to register signal handler");
+}
+
 void sendInfoRequest(int signal, pid_t pid)
 {
     union sigval val;
@@ -65,7 +82,7 @@ int strToRtSig(char* str)
 {
     int sig = strToInt(str);
     if(sig < SIGRTMIN || sig > SIGRTMAX)
-        errExit("strToSig: Signal number out of range");
+        errExit("strToRtSig: Signal number out of range");
 
     return sig;
 }
