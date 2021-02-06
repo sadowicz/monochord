@@ -12,33 +12,6 @@ void usageExit(const char* programName, const char* msg)
     exit(1);
 }
 
-void parseArgs(int argc, char** argv, int* sig, pid_t* pid)
-{
-    int opt;
-
-    *sig = -1;
-
-    while((opt = getopt(argc, argv, "-:c:")) != -1)
-    {
-        switch(opt)
-        {
-            case 'c':
-                *sig = strToRtSig(optarg);
-                break;
-            case 1:
-                *pid = strToInt(optarg);
-                break;
-            case ':':
-                errExit("parseArgs: Argument needs value.");
-            case '?':
-                errExit("parseArgs: Unrecognized argument.");
-        }
-    }
-
-    if(*sig == -1)
-        errExit("parseArgs: Non optional -c argument not given.");
-}
-
 void registerSignalHandler(int signal, void (*handler)(int, siginfo_t*, void *))
 {
     struct sigaction sa;
@@ -105,6 +78,40 @@ void decodeInfo(int codedInfo, Info* decodedInfo)
         decodedInfo->pidUsed = 1;
     if(codedInfo & 0x8)     // 1000
         decodedInfo->binUsed = 1;
+}
+
+void parseArgs(int argc, char** argv, int* sig, pid_t* pid)
+{
+    int opt;
+
+    *sig = -1;
+
+    while((opt = getopt(argc, argv, "-:c:")) != -1)
+    {
+        switch(opt)
+        {
+            case 'c':
+                *sig = strToRtSig(optarg);
+                break;
+            case 1:
+                *pid = strToInt(optarg);
+                break;
+            case ':':
+                errExit("parseArgs: Argument needs value.");
+            case '?':
+                errExit("parseArgs: Unrecognized argument.");
+        }
+    }
+
+    if(*sig == -1)
+        errExit("parseArgs: Non optional -c argument not given.");
+}
+
+void printInfo(Info* info)
+{
+    printf("REJESTRACJA: %sdziala\nPUNKT REFERENCYJNY: %suzywany\nIDENTYFIKACJA ZRODEL: %suzywana\nFORMAT BINARNY: %suzywany\n",
+           (info->recordingActive)? "":"nie", (info->refPointUsed)? "":"nie",
+           (info->pidUsed)? "":"nie", (info->binUsed)? "":"nie");
 }
 
 int strToInt(char* str)

@@ -27,6 +27,7 @@ int collectInfo(int signal);
 void decodeInfo(int codedInfo, Info* decodedInfo);
 
 void parseArgs(int argc, char** argv, int* sig, pid_t* pid);
+void printInfo(Info* info);
 int strToInt(char* str);
 int strToRtSig(char* str);
 
