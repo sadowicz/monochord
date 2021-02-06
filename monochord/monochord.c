@@ -4,8 +4,8 @@
 #include "parse.h"
 #include "udp.h"
 
-volatile uint8_t alrm = 0;
-volatile uint8_t io = 0;
+volatile sig_atomic_t alrm = 0;
+volatile sig_atomic_t io = 0;
 
 void initSim(short port, int* sockfd, SimParams* params, SimFlags* flags, char** dgramBuf);
 
