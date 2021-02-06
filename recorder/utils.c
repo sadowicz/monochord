@@ -107,14 +107,16 @@ void decodeCmd(int cmdData, ProgramFlags* flags)
         default:
         {
             flags->stopped = 0;
+            flags->useRefPoint = 0;
+            flags->usePid = 0;
 
-            if(cmdData - 8 >= 0)
+            if(cmdData - 8 >= 1)
             {
                 flags->truncFiles = 1;
                 cmdData -= 8;
             }
 
-            if(cmdData - 4 >= 0)
+            if(cmdData - 4 >= 1)
             {
                 flags->usePid = 1;
                 cmdData -= 4;
@@ -127,9 +129,7 @@ void decodeCmd(int cmdData, ProgramFlags* flags)
                 flags->useRefPoint = 1;
                 flags->updateRefPoint = 1;
             }
-            else if(cmdData == 1)
-                flags->useRefPoint = 0;
-            else
+            else if(cmdData < 1)
                 errExit("decodeCmd: Invalid command value");
 
             break;
