@@ -6,7 +6,7 @@
 
 #define MAX_RECORD_LEN 128
 #define MAX_NAME_LEN 8
-#define MAX_VALUE_LEN 50
+#define MAX_VALUE_LEN 64
 
 #include <stdio.h>
 #include <stdlib.h>

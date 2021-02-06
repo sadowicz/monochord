@@ -3,9 +3,9 @@
 
 void interpretDatagram(char* datagram, SimParams* params, SimFlags* flags)
 {
-    char recordBuf[MAX_RECORD_LEN] = {0};
-    char nameBuf[MAX_NAME_LEN] = {0};
-    char valueBuf[MAX_VALUE_LEN] = {0};
+    char* recordBuf = (char*)calloc(MAX_RECORD_LEN, sizeof(char));
+    char* nameBuf = (char*)calloc(MAX_NAME_LEN, sizeof(char));
+    char* valueBuf = (char*)calloc(MAX_VALUE_LEN, sizeof(char));
 
     char* readPtr = datagram;
     int totalRead = 0;
@@ -26,6 +26,10 @@ void interpretDatagram(char* datagram, SimParams* params, SimFlags* flags)
         memset(nameBuf, 0, MAX_NAME_LEN);
         memset(valueBuf, 0, MAX_VALUE_LEN);
     }
+
+    free(recordBuf);
+    free(nameBuf);
+    free(valueBuf);
 }
 
 void splitRecord(char* record, char* name, char* value)
