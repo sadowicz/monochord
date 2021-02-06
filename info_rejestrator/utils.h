@@ -15,6 +15,7 @@ void usageExit(const char* programName, const char* msg);
 
 void registerSignalHandler(int signal, void (*handler)(int, siginfo_t*, void *));
 void sendInfoRequest(int signal, pid_t pid);
+int collectInfo(int signal);
 
 void parseArgs(int argc, char** argv, int* sig, pid_t* pid);
 int strToInt(char* str);

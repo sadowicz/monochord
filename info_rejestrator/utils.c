@@ -65,6 +65,36 @@ void sendInfoRequest(int signal, pid_t pid)
         errExit("sendInfoRequest: Unable to send signal with info request.");
 }
 
+int collectInfo(int signal)
+{
+    sigset_t set;
+    siginfo_t siginfo;
+
+    struct timespec timeout = {.tv_sec = 2, .tv_nsec = 0};
+
+    if(sigemptyset(&set))
+        errExit("collectInfo: Unable to empty set.");
+
+    if(sigaddset(&set, signal))
+        errExit("collectInfo: Unable to add signal to set.");
+
+    errno = 0;
+
+    if(sigtimedwait(&set, &siginfo, &timeout) == -1)
+    {
+        if(errno == EAGAIN)
+        {
+            fprintf(stderr, "No response catched before timeout.\n");
+            exit(0);    // technically detecting timeout and informing about it is valid action (not ERROR) based on pdf
+                        // so I'm using here fprintf and exiting with success (0) instead of errExit
+        }
+        else
+            errExit("collectInfo: Unable to perform waiting for response");
+    }
+
+    return siginfo.si_value.sival_int;  // return coded info
+}
+
 int strToInt(char* str)
 {
     char* endptr = NULL;
