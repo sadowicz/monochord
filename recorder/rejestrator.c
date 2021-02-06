@@ -5,7 +5,7 @@
 
 void openFiles(int* txtFd, char* txtPath, int* binFd, char* binPath, int useBinFlag);
 
-void runRecorder();
+void runRecorder(int dataSig, int cmdSig, int txtFd, int binFd, ProgramFlags* flags);
 
 void executeCmd(int txtFd, int binFd, int dataSig, int cmdSig, struct timespec* refPoint, ProgramFlags* flags);
 void executeStartCmd(int txtFd, int binFd, int dataSig, struct timespec* refPoint, ProgramFlags* flags);
@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
     ignoreSignal(dataSig);  // instead of blocking, for signal not to be queued
     registerSignalHandler(cmdSig, cmdSignalNotifier);
 
-    runRecorder(dataSig, cmdSig, txtFd, txtPath, binFd, binPath, &flags);
+    runRecorder(dataSig, cmdSig, txtFd, binFd, &flags);
 
     // No need to close files here because the only way to exit is to terminate
 
@@ -52,7 +52,7 @@ void openFiles(int* txtFd, char* txtPath, int* binFd, char* binPath, int useBinF
         *binFd = openFile(binPath);
 }
 
-void runRecorder(int dataSig, int cmdSig, int txtFd, char* txtPath, int binFd, char* binPath, ProgramFlags* flags)
+void runRecorder(int dataSig, int cmdSig, int txtFd, int binFd, ProgramFlags* flags)
 {
     struct timespec refPoint;
 
