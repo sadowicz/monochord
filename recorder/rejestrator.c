@@ -93,7 +93,7 @@ void executeCmd(int txtFd, int binFd, int dataSig, int cmdSig, struct timespec* 
 
     decodeCmd(cmdSigInfo.data, flags);
 
-    if(flags->stopped)
+    if(flags->stopped && !isSignalIgnored(dataSig))
     {
         ignoreSignal(dataSig);  // instead of blocking, for signal not be queued
     }
