@@ -172,7 +172,7 @@ void writeRecordTxt(int fd, struct timespec* timestamp, float data, pid_t pid, P
     if(!buffer)
         errExit("writeRecordTxt: Unable to allocate write buffer.");
 
-    if(flags->useRefPoint)
+    if(!flags->useRefPoint)
         getStrTimestampGlobal(timestamp, buffer);
     else
         getStrTimestampLocal(timestamp, buffer);
@@ -217,12 +217,12 @@ void getStrTimestampGlobal(struct timespec* timestamp, char* buffer)
     if(!localtime_r(&(timestamp->tv_sec), &readable))
         errExit("getStrTimestampGlobal: Unable to get human readable time values");
 
-    long milliseconds = timestamp->tv_nsec / 1000000;
+    double secMs = readable.tm_sec + (double)(timestamp->tv_nsec) / 1000000000;
 
     // dd/mm/yyyy HH:MM:SS.MS
-    int written = sprintf(buffer, "%d/%d/%d %d:%d:%d.%ld",
+    int written = sprintf(buffer, "%d/%d/%d %d:%d:%.3f",
             readable.tm_mday, readable.tm_mon + 1, readable.tm_year + 1900,
-            readable.tm_hour, readable.tm_min, readable.tm_sec, milliseconds);
+            readable.tm_hour, readable.tm_min, secMs);
 
     if(written <= 0)
         errExit("getStrTimestampGlobal: Unable to write timestamp to buffer");
@@ -233,11 +233,11 @@ void getStrTimestampLocal(struct timespec* timestamp, char* buffer)
     time_t hours = timestamp->tv_sec / 3600;
     time_t mins = (timestamp->tv_sec % 3600) / 60;
     time_t sec = ((timestamp->tv_sec % 3600) % 60) / 60;
-    long milliseconds = timestamp->tv_nsec / 1000000;
+    double secMs = sec + (double)(timestamp->tv_nsec) / 1000000000;
 
     // cH:MM:SS.MS
-    int written = sprintf(buffer, "%ld:%ld:%ld.%ld",
-            hours, mins, sec, milliseconds);
+    int written = sprintf(buffer, "%ld:%ld:%ld.%.3f",
+            hours, mins, sec, secMs);
 
     if(written <= 0)
         errExit("getStrTimestampLocal: Unable to write timestamp to buffer");
