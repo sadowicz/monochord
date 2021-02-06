@@ -1,4 +1,3 @@
-#include <signal.h>
 #include "parse.h"
 
 void interpretDatagram(char* datagram, SimParams* params, SimFlags* flags)

@@ -1,3 +1,6 @@
+#define _POSIX_C_SOURCE 200809L
+#define _XOPEN_SOURCE
+
 #include <stdio.h>
 
 #include "utils.h"
