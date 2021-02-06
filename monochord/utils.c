@@ -84,8 +84,8 @@ void createTimer(timer_t* timerId)
 
 void armTimer(timer_t timerId, float interval)
 {
-    time_t sec = (time_t)(interval * 100000000) / 1000000000;
-    long nsec = (long)(interval * 100000000) % 1000000000;
+    time_t sec = (time_t)(interval * 1000000000) / 1000000000;
+    long nsec = (long)(interval * 1000000000) % 1000000000;
 
     struct timespec ts = { .tv_sec = sec, .tv_nsec = nsec };
     struct itimerspec value = {.it_interval = ts, .it_value = ts};
