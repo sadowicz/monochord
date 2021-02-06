@@ -3,4 +3,4 @@ project(info_rejestrator C)
 
 set(CMAKE_C_STANDARD 11)
 
-add_executable(info_rejestrator rejestrator_info.c)
+add_executable(info_rejestrator rejestrator_info.c utils.c utils.h)
