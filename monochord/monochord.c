@@ -54,7 +54,7 @@ void initSim(short port, int* sockfd, SimParams* params, SimFlags* flags, char**
 
 void performSim(int sockfd, SimParams* params, SimFlags* flags, char* dgramBuf)
 {
-    double sinValue = 0;
+    float sinValue = 0;
     double refPoint = getTimestampSec();
 
     while(params->timeRemaining > 0 || flags->stopped)
@@ -75,7 +75,7 @@ void performSim(int sockfd, SimParams* params, SimFlags* flags, char* dgramBuf)
             if(!flags->suspended)
             {
                 sinValue = calcSinusoide(params, getTimestampSec() - refPoint);
-                sendRtSignal(params, flags, &sinValue);
+                sendRtSignal(params, flags, sinValue);
 
                 params->timeRemaining -= params->probe;
             }

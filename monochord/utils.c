@@ -52,10 +52,10 @@ void registerSignalHandler(int signal, void(*handler)(int))
         errExit("registerSignalHandler: Unable to register signal handler");
 }
 
-void sendRtSignal(SimParams* params, SimFlags* flags, double* value)
+void sendRtSignal(SimParams* params, SimFlags* flags, float value)
 {
     union sigval val;
-    val.sival_ptr = (void*)value;
+    memcpy(&val.sival_int, &value, sizeof(int));    // method to pass (interpret) float as int
 
     errno = 0;
 
@@ -104,7 +104,7 @@ double getTimestampSec()
     return ts.tv_sec + (double)ts.tv_nsec / 1000000000;
 }
 
-double calcSinusoide(SimParams* params, double time)
+float calcSinusoide(SimParams* params, double time)
 {
-    return params->amp * sin(2 * PI * params->freq * time);
+    return (float)(params->amp * sin(2 * PI * params->freq * time));
 }

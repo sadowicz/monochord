@@ -11,6 +11,7 @@
 #include <signal.h>
 #include <stdint.h>
 #include <math.h>
+#include <memory.h>
 #include <errno.h>
 
 typedef struct SimParams {
@@ -42,13 +43,13 @@ void initParamsDefaults(SimParams* params);
 void  initFlagsDefaults(SimFlags* flags);
 
 void registerSignalHandler(int signal, void(*handler)(int));
-void sendRtSignal(SimParams* params, SimFlags* flags, double* value);
+void sendRtSignal(SimParams* params, SimFlags* flags, float value);
 
 void createTimer(timer_t* timerId);
 void armTimer(timer_t timerId, float interval);
 
 double getTimestampSec();
 
-double calcSinusoide(SimParams* params, double time);
+float calcSinusoide(SimParams* params, double time);
 
 #endif
