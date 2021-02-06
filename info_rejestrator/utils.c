@@ -12,6 +12,33 @@ void usageExit(const char* programName, const char* msg)
     exit(1);
 }
 
+void parseArgs(int argc, char** argv, int* sig, pid_t* pid)
+{
+    int opt;
+
+    *sig = -1;
+
+    while((opt = getopt(argc, argv, "-:c:")) != -1)
+    {
+        switch(opt)
+        {
+            case 'c':
+                *sig = strToSig(optarg);
+                break;
+            case 1:
+                *pid = strToInt(optarg);
+                break;
+            case ':':
+                errExit("parseArgs: Argument needs value.");
+            case '?':
+                errExit("parseArgs: Unrecognized argument.");
+        }
+    }
+
+    if(*sig == -1)
+        errExit("parseArgs: Non optional -c argument not given.");
+}
+
 int strToInt(char* str)
 {
     char* endptr = NULL;
