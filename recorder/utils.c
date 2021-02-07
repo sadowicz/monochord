@@ -234,9 +234,6 @@ void getStrTimestampGlobal(struct timespec* timestamp, char* buffer)
 
 void getStrTimestampLocal(struct timespec* timestamp, char* buffer)
 {
-    //TODO: Why seconds, (and maybe hours) not count-up v
-    //TODO: Why miliseconds <.300 prints as .000
-
     time_t hours = timestamp->tv_sec / 3600;
     time_t mins = (timestamp->tv_sec % 3600) / 60;
     time_t sec = (timestamp->tv_sec % 3600) % 60;
@@ -267,4 +264,6 @@ void getTimestampDiff(struct timespec* res, struct timespec* earlier, struct tim
         res->tv_sec--;
         res->tv_nsec = 1000000000 - earlier->tv_nsec + later->tv_nsec;
     }
+    else
+        res->tv_nsec = later->tv_nsec - earlier->tv_nsec;
 }
