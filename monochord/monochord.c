@@ -88,6 +88,7 @@ void performSim(int sockfd, SimParams* params, SimFlags* flags, char* dgramBuf)
         {
             refPoint = getTimestampSec();   // reset reference point
             armTimer(params->timerId, params->probe);    // reset timer
+            flags->reset = 0;
         }
     }
 }
